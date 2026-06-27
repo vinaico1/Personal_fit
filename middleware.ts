@@ -1,5 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+// Força runtime Node.js: suporta todos os módulos Node.js nativos
+// (Edge Runtime não suporta node:async_hooks nem node:buffer)
+export const runtime = "nodejs";
+
 // Extrai o project ref da URL do Supabase
 // Ex: https://zrvqtucsjogafnnwvosi.supabase.co → zrvqtucsjogafnnwvosi
 function getProjectRef(): string {
