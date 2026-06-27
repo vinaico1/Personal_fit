@@ -33,9 +33,13 @@ export default function CadastroPage() {
     });
 
     if (error) {
-      toast.error(error.message === "User already registered"
-        ? "Este email já está cadastrado."
-        : "Erro ao criar conta. Tente novamente.");
+      const msg =
+        error.message === "User already registered"
+          ? "Este email já está cadastrado. Tente fazer login."
+          : error.message === "Email rate limit exceeded"
+          ? "Muitas tentativas. Aguarde alguns minutos e tente novamente."
+          : `Erro ao criar conta: ${error.message}`;
+      toast.error(msg);
       setLoading(false);
       return;
     }
