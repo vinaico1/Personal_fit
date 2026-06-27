@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Dumbbell, Play } from "lucide-react";
+import { Dumbbell } from "lucide-react";
 
 const CORES_GRUPO: Record<string, { bg: string; text: string; border: string }> = {
   Peito:   { bg: "bg-red-500/20",    text: "text-red-400",    border: "border-red-500/30" },
@@ -16,6 +16,12 @@ const CORES_GRUPO: Record<string, { bg: string; text: string; border: string }> 
   Cardio:  { bg: "bg-brand-500/20",  text: "text-brand-400",  border: "border-brand-500/30" },
 };
 
+function extrairVideoId(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const match = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+  return match?.[1] ?? null;
+}
+
 interface Props {
   exercicioId: string;
   exercicioNome: string;
@@ -26,11 +32,11 @@ interface Props {
 
 export function ExercicioImagem({ exercicioId, exercicioNome, gifUrl: gifUrlInicial, grupoMuscular, videoUrl }: Props) {
   const [imgUrl, setImgUrl] = useState<string | null>(gifUrlInicial ?? null);
-  const [source, setSource] = useState<string | null>(gifUrlInicial ? "db" : null);
   const [carregando, setCarregando] = useState(!gifUrlInicial);
   const [erro, setErro] = useState(false);
 
   const cores = CORES_GRUPO[grupoMuscular] ?? { bg: "bg-slate-700/30", text: "text-slate-400", border: "border-slate-600/30" };
+  const videoId = extrairVideoId(videoUrl);
 
   useEffect(() => {
     if (gifUrlInicial || erro) return;
@@ -40,13 +46,28 @@ export function ExercicioImagem({ exercicioId, exercicioNome, gifUrl: gifUrlInic
       .then((r) => r.json())
       .then((data) => {
         setImgUrl(data.url ?? null);
-        setSource(data.source ?? null);
         if (!data.url) setErro(true);
       })
       .catch(() => setErro(true))
       .finally(() => setCarregando(false));
   }, [exercicioId, exercicioNome, gifUrlInicial, erro]);
 
+  // 1. Se tiver video ID → embed YouTube com player completo
+  if (videoId) {
+    return (
+      <div className={`w-full rounded-xl overflow-hidden border ${cores.border} relative bg-black`} style={{ aspectRatio: "16/9" }}>
+        <iframe
+          src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`}
+          title={`Demonstração: ${exercicioNome}`}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="absolute inset-0 w-full h-full"
+        />
+      </div>
+    );
+  }
+
+  // 2. Loading
   if (carregando) {
     return (
       <div className={`w-full h-44 rounded-xl ${cores.bg} border ${cores.border} flex items-center justify-center`}>
@@ -55,41 +76,27 @@ export function ExercicioImagem({ exercicioId, exercicioNome, gifUrl: gifUrlInic
     );
   }
 
-  if (!imgUrl || erro) {
+  // 3. GIF/imagem da API (Wger ou thumbnail)
+  if (imgUrl && !erro) {
     return (
-      <div className={`w-full h-44 rounded-xl ${cores.bg} border ${cores.border} flex flex-col items-center justify-center gap-2`}>
-        <Dumbbell className={`w-10 h-10 ${cores.text} opacity-40`} />
-        <span className={`text-xs ${cores.text} opacity-60`}>{grupoMuscular}</span>
+      <div className={`w-full h-44 rounded-xl overflow-hidden border ${cores.border} relative bg-slate-900`}>
+        <Image
+          src={imgUrl}
+          alt={`Demonstração: ${exercicioNome}`}
+          fill
+          className="object-cover"
+          unoptimized
+          onError={() => { setImgUrl(null); setErro(true); }}
+        />
       </div>
     );
   }
 
-  const isYoutube = source === "youtube" || imgUrl.includes("ytimg.com") || imgUrl.includes("img.youtube.com");
-
+  // 4. Placeholder
   return (
-    <a
-      href={videoUrl ?? `https://www.youtube.com/results?search_query=${encodeURIComponent(exercicioNome)}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`w-full h-44 rounded-xl overflow-hidden border ${cores.border} relative bg-slate-900 block`}
-    >
-      <Image
-        src={imgUrl}
-        alt={`Demonstração: ${exercicioNome}`}
-        fill
-        className="object-cover"
-        unoptimized
-        onError={() => { setImgUrl(null); setErro(true); }}
-      />
-      {/* Overlay com botão de play para thumbnails do YouTube */}
-      {isYoutube && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 hover:bg-black/10 transition-colors">
-          <div className="w-12 h-12 rounded-full bg-red-600/90 flex items-center justify-center shadow-lg">
-            <Play className="w-5 h-5 text-white fill-white ml-0.5" />
-          </div>
-          <span className="text-white text-xs mt-2 font-medium drop-shadow">Ver demonstração</span>
-        </div>
-      )}
-    </a>
+    <div className={`w-full h-44 rounded-xl ${cores.bg} border ${cores.border} flex flex-col items-center justify-center gap-2`}>
+      <Dumbbell className={`w-10 h-10 ${cores.text} opacity-40`} />
+      <span className={`text-xs ${cores.text} opacity-60`}>{grupoMuscular}</span>
+    </div>
   );
 }
