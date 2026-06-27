@@ -2,19 +2,18 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Dumbbell } from "lucide-react";
+import { Dumbbell, Play } from "lucide-react";
 
-// Cores por grupo muscular
 const CORES_GRUPO: Record<string, { bg: string; text: string; border: string }> = {
-  Peito:    { bg: "bg-red-500/20",    text: "text-red-400",    border: "border-red-500/30" },
-  Costas:   { bg: "bg-blue-500/20",   text: "text-blue-400",   border: "border-blue-500/30" },
-  Ombros:   { bg: "bg-yellow-500/20", text: "text-yellow-400", border: "border-yellow-500/30" },
-  Bíceps:   { bg: "bg-orange-500/20", text: "text-orange-400", border: "border-orange-500/30" },
-  Tríceps:  { bg: "bg-purple-500/20", text: "text-purple-400", border: "border-purple-500/30" },
-  Pernas:   { bg: "bg-green-500/20",  text: "text-green-400",  border: "border-green-500/30" },
-  Glúteos:  { bg: "bg-pink-500/20",   text: "text-pink-400",   border: "border-pink-500/30" },
-  Core:     { bg: "bg-cyan-500/20",   text: "text-cyan-400",   border: "border-cyan-500/30" },
-  Cardio:   { bg: "bg-brand-500/20",  text: "text-brand-400",  border: "border-brand-500/30" },
+  Peito:   { bg: "bg-red-500/20",    text: "text-red-400",    border: "border-red-500/30" },
+  Costas:  { bg: "bg-blue-500/20",   text: "text-blue-400",   border: "border-blue-500/30" },
+  Ombros:  { bg: "bg-yellow-500/20", text: "text-yellow-400", border: "border-yellow-500/30" },
+  Bíceps:  { bg: "bg-orange-500/20", text: "text-orange-400", border: "border-orange-500/30" },
+  Tríceps: { bg: "bg-purple-500/20", text: "text-purple-400", border: "border-purple-500/30" },
+  Pernas:  { bg: "bg-green-500/20",  text: "text-green-400",  border: "border-green-500/30" },
+  Glúteos: { bg: "bg-pink-500/20",   text: "text-pink-400",   border: "border-pink-500/30" },
+  Core:    { bg: "bg-cyan-500/20",   text: "text-cyan-400",   border: "border-cyan-500/30" },
+  Cardio:  { bg: "bg-brand-500/20",  text: "text-brand-400",  border: "border-brand-500/30" },
 };
 
 interface Props {
@@ -22,10 +21,12 @@ interface Props {
   exercicioNome: string;
   gifUrl?: string | null;
   grupoMuscular: string;
+  videoUrl?: string | null;
 }
 
-export function ExercicioImagem({ exercicioId, exercicioNome, gifUrl: gifUrlInicial, grupoMuscular }: Props) {
+export function ExercicioImagem({ exercicioId, exercicioNome, gifUrl: gifUrlInicial, grupoMuscular, videoUrl }: Props) {
   const [imgUrl, setImgUrl] = useState<string | null>(gifUrlInicial ?? null);
+  const [source, setSource] = useState<string | null>(gifUrlInicial ? "db" : null);
   const [carregando, setCarregando] = useState(!gifUrlInicial);
   const [erro, setErro] = useState(false);
 
@@ -39,6 +40,7 @@ export function ExercicioImagem({ exercicioId, exercicioNome, gifUrl: gifUrlInic
       .then((r) => r.json())
       .then((data) => {
         setImgUrl(data.url ?? null);
+        setSource(data.source ?? null);
         if (!data.url) setErro(true);
       })
       .catch(() => setErro(true))
@@ -62,16 +64,32 @@ export function ExercicioImagem({ exercicioId, exercicioNome, gifUrl: gifUrlInic
     );
   }
 
+  const isYoutube = source === "youtube" || imgUrl.includes("ytimg.com") || imgUrl.includes("img.youtube.com");
+
   return (
-    <div className={`w-full h-44 rounded-xl overflow-hidden border ${cores.border} relative bg-slate-900`}>
+    <a
+      href={videoUrl ?? `https://www.youtube.com/results?search_query=${encodeURIComponent(exercicioNome)}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`w-full h-44 rounded-xl overflow-hidden border ${cores.border} relative bg-slate-900 block`}
+    >
       <Image
         src={imgUrl}
         alt={`Demonstração: ${exercicioNome}`}
         fill
-        className="object-contain p-2"
+        className="object-cover"
         unoptimized
         onError={() => { setImgUrl(null); setErro(true); }}
       />
-    </div>
+      {/* Overlay com botão de play para thumbnails do YouTube */}
+      {isYoutube && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 hover:bg-black/10 transition-colors">
+          <div className="w-12 h-12 rounded-full bg-red-600/90 flex items-center justify-center shadow-lg">
+            <Play className="w-5 h-5 text-white fill-white ml-0.5" />
+          </div>
+          <span className="text-white text-xs mt-2 font-medium drop-shadow">Ver demonstração</span>
+        </div>
+      )}
+    </a>
   );
 }

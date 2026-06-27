@@ -74,6 +74,7 @@ export function ExercicioCard({ exercicio, series, repeticoes, descanso, carga }
               exercicioNome={exercicio.nome}
               gifUrl={exercicio.gif_url}
               grupoMuscular={exercicio.grupo_muscular}
+              videoUrl={exercicio.video_url}
             />
           </div>
 
