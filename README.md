@@ -446,7 +446,7 @@ Gerador gratuito: [realfavicongenerator.net](https://realfavicongenerator.net)
 | Campo | Valor |
 |-------|-------|
 | Email | vcsconsult1204@gmail.com |
-| Senha | 12345678 |
+| Senha | XXXXXXXXX |
 | Perfil | Admin (is_admin = true) |
 
 Criado via `supabase/criar-admin.sql`.
