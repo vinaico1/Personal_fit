@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Timer, Youtube, CheckCircle, Circle } from "lucide-react";
+import { ChevronDown, ChevronUp, Timer, CheckCircle, Circle } from "lucide-react";
 import { ExercicioImagem } from "./exercicio-imagem";
 import type { Exercicio } from "@/types";
 
@@ -74,7 +74,6 @@ export function ExercicioCard({ exercicio, series, repeticoes, descanso, carga }
               exercicioNome={exercicio.nome}
               gifUrl={exercicio.gif_url}
               grupoMuscular={exercicio.grupo_muscular}
-              videoUrl={exercicio.video_url}
             />
           </div>
 
@@ -147,18 +146,6 @@ export function ExercicioCard({ exercicio, series, repeticoes, descanso, carga }
               </div>
             )}
 
-            {/* Botão YouTube */}
-            {exercicio.video_url && (
-              <a
-                href={exercicio.video_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-red-600/20 border border-red-600/30 text-red-400 text-sm font-medium hover:bg-red-600/30 transition-colors"
-              >
-                <Youtube className="w-4 h-4" />
-                Ver tutorial em vídeo
-              </a>
-            )}
           </div>
         </div>
       )}

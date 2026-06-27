@@ -4,9 +4,8 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "**.supabase.co" },
+      { protocol: "https", hostname: "fitnessprogramer.com" },
       { protocol: "https", hostname: "muscle.wiki" },
-      { protocol: "https", hostname: "i.ytimg.com" },
-      { protocol: "https", hostname: "img.youtube.com" },
       { protocol: "https", hostname: "wger.de" },
     ],
   },

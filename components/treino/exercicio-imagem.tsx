@@ -16,27 +16,19 @@ const CORES_GRUPO: Record<string, { bg: string; text: string; border: string }> 
   Cardio:  { bg: "bg-brand-500/20",  text: "text-brand-400",  border: "border-brand-500/30" },
 };
 
-function extrairVideoId(url: string | null | undefined): string | null {
-  if (!url) return null;
-  const match = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
-  return match?.[1] ?? null;
-}
-
 interface Props {
   exercicioId: string;
   exercicioNome: string;
   gifUrl?: string | null;
   grupoMuscular: string;
-  videoUrl?: string | null;
 }
 
-export function ExercicioImagem({ exercicioId, exercicioNome, gifUrl: gifUrlInicial, grupoMuscular, videoUrl }: Props) {
+export function ExercicioImagem({ exercicioId, exercicioNome, gifUrl: gifUrlInicial, grupoMuscular }: Props) {
   const [imgUrl, setImgUrl] = useState<string | null>(gifUrlInicial ?? null);
   const [carregando, setCarregando] = useState(!gifUrlInicial);
   const [erro, setErro] = useState(false);
 
   const cores = CORES_GRUPO[grupoMuscular] ?? { bg: "bg-slate-700/30", text: "text-slate-400", border: "border-slate-600/30" };
-  const videoId = extrairVideoId(videoUrl);
 
   useEffect(() => {
     if (gifUrlInicial || erro) return;
@@ -52,22 +44,7 @@ export function ExercicioImagem({ exercicioId, exercicioNome, gifUrl: gifUrlInic
       .finally(() => setCarregando(false));
   }, [exercicioId, exercicioNome, gifUrlInicial, erro]);
 
-  // 1. Se tiver video ID → embed YouTube com player completo
-  if (videoId) {
-    return (
-      <div className={`w-full rounded-xl overflow-hidden border ${cores.border} relative bg-black`} style={{ aspectRatio: "16/9" }}>
-        <iframe
-          src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`}
-          title={`Demonstração: ${exercicioNome}`}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          className="absolute inset-0 w-full h-full"
-        />
-      </div>
-    );
-  }
-
-  // 2. Loading
+  // Loading
   if (carregando) {
     return (
       <div className={`w-full h-44 rounded-xl ${cores.bg} border ${cores.border} flex items-center justify-center`}>
@@ -76,7 +53,7 @@ export function ExercicioImagem({ exercicioId, exercicioNome, gifUrl: gifUrlInic
     );
   }
 
-  // 3. GIF/imagem da API (Wger ou thumbnail)
+  // GIF do fitnessprogramer.com
   if (imgUrl && !erro) {
     return (
       <div className={`w-full h-44 rounded-xl overflow-hidden border ${cores.border} relative bg-slate-900`}>
@@ -84,7 +61,7 @@ export function ExercicioImagem({ exercicioId, exercicioNome, gifUrl: gifUrlInic
           src={imgUrl}
           alt={`Demonstração: ${exercicioNome}`}
           fill
-          className="object-cover"
+          className="object-contain"
           unoptimized
           onError={() => { setImgUrl(null); setErro(true); }}
         />
@@ -92,7 +69,7 @@ export function ExercicioImagem({ exercicioId, exercicioNome, gifUrl: gifUrlInic
     );
   }
 
-  // 4. Placeholder
+  // Placeholder
   return (
     <div className={`w-full h-44 rounded-xl ${cores.bg} border ${cores.border} flex flex-col items-center justify-center gap-2`}>
       <Dumbbell className={`w-10 h-10 ${cores.text} opacity-40`} />

@@ -24,7 +24,6 @@ const beneficios = [
   "Cálculo de TMB, GET e macros individualizados",
   "Banco com mais de 60 alimentos cadastrados",
   "Exercícios com instruções detalhadas",
-  "Funciona como app (PWA — sem app store)",
   "100% gratuito para começar",
 ];
 

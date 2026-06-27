@@ -3,7 +3,8 @@ import { redirect } from "next/navigation";
 import { nomeDiaSemana, dataHoje } from "@/lib/utils";
 import { ExercicioCard } from "@/components/treino/exercicio-card";
 import { MarcarTreinoBtn } from "@/components/treino/marcar-treino-btn";
-import { Dumbbell, Calendar, ChevronRight, Trophy } from "lucide-react";
+import { SelecionarModeloTreino } from "@/components/treino/selecionar-modelo";
+import { Dumbbell, Calendar, ChevronRight, Trophy, RefreshCw } from "lucide-react";
 import Link from "next/link";
 
 export default async function TreinoPage() {
@@ -58,20 +59,14 @@ export default async function TreinoPage() {
       </div>
 
       {!plano && (
-        <div className="glass-card rounded-2xl p-6 text-center mb-6">
-          <Dumbbell className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-          <p className="text-slate-400 mb-4">Nenhum plano de treino encontrado.</p>
-          <Link href="/anamnese" className="brand-gradient text-white font-medium px-6 py-2.5 rounded-xl inline-block">
-            Criar plano
-          </Link>
-        </div>
+        <SelecionarModeloTreino />
       )}
 
       {plano && (
         <>
           {/* Info do plano */}
           <div className="glass-card rounded-2xl p-4 mb-4">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mb-3">
               <div>
                 <p className="text-slate-400 text-xs uppercase tracking-wider">Split</p>
                 <p className="font-bold">{plano.tipo}</p>
@@ -81,6 +76,13 @@ export default async function TreinoPage() {
                 <p className="font-bold">{plano.dias_semana}x / semana</p>
               </div>
             </div>
+            <Link
+              href="/treino/modelos"
+              className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-700 transition-colors text-xs font-medium"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              Trocar programa
+            </Link>
           </div>
 
           {/* Treino de hoje */}
