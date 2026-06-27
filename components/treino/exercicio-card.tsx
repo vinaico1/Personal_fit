@@ -30,13 +30,6 @@ export function ExercicioCard({ exercicio, series, repeticoes, descanso, carga }
     setSeriesFeitas((prev) => prev.map((v, i) => (i === idx ? !v : v)));
   }
 
-  const youtubeId = exercicio.video_url
-    ? new URL(exercicio.video_url).searchParams.get("v")
-    : null;
-
-  const thumbnailUrl = youtubeId
-    ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`
-    : null;
 
   return (
     <div className={`rounded-xl border overflow-hidden transition-all ${
