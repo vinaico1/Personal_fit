@@ -8,11 +8,10 @@ import { BuscarAlimentoModal } from "@/components/nutricao/buscar-alimento-modal
 export default async function NutricaoPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
 
   const [{ data: anamnese }, { data: plano }] = await Promise.all([
-    supabase.from("anamneses").select("*").eq("user_id", user.id).maybeSingle(),
-    supabase.from("planos_nutricionais").select("*, refeicoes(*, refeicao_alimentos(*, alimentos(*)))").eq("user_id", user.id).eq("ativo", true).maybeSingle(),
+    supabase.from("anamneses").select("*").eq("user_id", user!.id).maybeSingle(),
+    supabase.from("planos_nutricionais").select("*, refeicoes(*, refeicao_alimentos(*, alimentos(*)))").eq("user_id", user!.id).eq("ativo", true).maybeSingle(),
   ]);
 
   if (!anamnese) redirect("/anamnese");
