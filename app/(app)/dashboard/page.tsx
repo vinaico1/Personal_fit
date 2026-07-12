@@ -1,15 +1,17 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Activity, ChevronRight, Dumbbell, Salad, TrendingUp, Flame, Droplets } from "lucide-react";
 import { formatarCaloria, calcularPorcentagem, dataHoje, labelObjetivo } from "@/lib/utils";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
 
   const [{ data: profile }, { data: anamnese }] = await Promise.all([
-    supabase.from("profiles").select("*").eq("id", user!.id).single(),
-    supabase.from("anamneses").select("*").eq("user_id", user!.id).maybeSingle(),
+    supabase.from("profiles").select("*").eq("id", user.id).single(),
+    supabase.from("anamneses").select("*").eq("user_id", user.id).maybeSingle(),
   ]);
 
   const hoje = dataHoje();
