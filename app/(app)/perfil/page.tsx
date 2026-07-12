@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import { labelObjetivo, labelAtividade, formatarData } from "@/lib/utils";
 import { calcularIMC } from "@/lib/calculations";
 import { LogoutBtn } from "@/components/perfil/logout-btn";
@@ -8,11 +9,12 @@ import { User, Scale, Activity, Target, TrendingUp } from "lucide-react";
 export default async function PerfilPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
 
   const [{ data: profile }, { data: anamnese }, { data: medidas }] = await Promise.all([
-    supabase.from("profiles").select("*").eq("id", user!.id).single(),
-    supabase.from("anamneses").select("*").eq("user_id", user!.id).maybeSingle(),
-    supabase.from("medidas_corporais").select("*").eq("user_id", user!.id).order("data", { ascending: false }).limit(10),
+    supabase.from("profiles").select("*").eq("id", user.id).single(),
+    supabase.from("anamneses").select("*").eq("user_id", user.id).maybeSingle(),
+    supabase.from("medidas_corporais").select("*").eq("user_id", user.id).order("data", { ascending: false }).limit(10),
   ]);
 
   const imc = anamnese ? calcularIMC(anamnese.peso_kg, anamnese.altura_cm) : null;

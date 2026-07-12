@@ -4,14 +4,15 @@ import { nomeDiaSemana, dataHoje } from "@/lib/utils";
 import { ExercicioCard } from "@/components/treino/exercicio-card";
 import { MarcarTreinoBtn } from "@/components/treino/marcar-treino-btn";
 import { SelecionarModeloTreino } from "@/components/treino/selecionar-modelo";
-import { Dumbbell, Calendar, ChevronRight, Trophy, RefreshCw } from "lucide-react";
+import { Calendar, ChevronRight, Trophy, RefreshCw } from "lucide-react";
 import Link from "next/link";
 
 export default async function TreinoPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
 
-  const { data: anamnese } = await supabase.from("anamneses").select("*").eq("user_id", user!.id).maybeSingle();
+  const { data: anamnese } = await supabase.from("anamneses").select("*").eq("user_id", user.id).maybeSingle();
   if (!anamnese) redirect("/anamnese");
 
   const { data: plano } = await supabase
